@@ -25,15 +25,22 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const openaiApiKey = process.env.OPENAI_API_KEY;
     if (!openaiApiKey) {
+      console.error(
+        "❌ OPENAI_API_KEY is not set. Please add it to your .env.local file."
+      );
       return new Response(
         JSON.stringify({
-          error: "Missing OPENAI_API_KEY environment variable",
+          error: "Server configuration error: Missing OPENAI_API_KEY. Please check server logs.",
         }),
         {
           status: 500,
           headers: { "Content-Type": "application/json" },
         }
       );
+    }
+
+    if (process.env.NODE_ENV !== "production") {
+      console.log("✅ OPENAI_API_KEY is configured");
     }
 
     const parsedBody = await safeParseJson<CreateSessionRequestBody>(request);

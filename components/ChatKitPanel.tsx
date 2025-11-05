@@ -88,13 +88,20 @@ export function ChatKitPanel({
     };
 
     const handleError = (event: Event) => {
-      console.error("Failed to load chatkit.js for some reason", event);
+      const detail = (event as CustomEvent<unknown>)?.detail ?? "unknown error";
+      console.error("Failed to load ChatKit script:", {
+        detail,
+        event,
+        customElementsAvailable: !!window.customElements,
+      });
       if (!isMountedRef.current) {
         return;
       }
       setScriptStatus("error");
-      const detail = (event as CustomEvent<unknown>)?.detail ?? "unknown error";
-      setErrorState({ script: `Error: ${detail}`, retryable: false });
+      setErrorState({
+        script: `Failed to load ChatKit: ${detail}. Please check your network connection and try again.`,
+        retryable: true,
+      });
       setIsInitializingSession(false);
     };
 
@@ -112,11 +119,11 @@ export function ChatKitPanel({
           handleError(
             new CustomEvent("chatkit-script-error", {
               detail:
-                "ChatKit web component is unavailable. Verify that the script URL is reachable.",
+                "ChatKit took too long to load. The script may be blocked or unavailable.",
             })
           );
         }
-      }, 5000);
+      }, 10000);
     }
 
     return () => {

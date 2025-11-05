@@ -1,7 +1,19 @@
 import { ColorScheme, StartScreenPrompt, ThemeOption } from "@openai/chatkit";
 
+const isDev = process.env.NODE_ENV !== "production";
+
 export const WORKFLOW_ID =
   process.env.NEXT_PUBLIC_CHATKIT_WORKFLOW_ID?.trim() ?? "";
+
+if (isDev && !WORKFLOW_ID) {
+  console.warn(
+    "⚠️ NEXT_PUBLIC_CHATKIT_WORKFLOW_ID is not set in .env.local. ChatKit will not work without it."
+  );
+}
+
+if (isDev && WORKFLOW_ID) {
+  console.log("✅ ChatKit Workflow ID loaded:", WORKFLOW_ID.substring(0, 10) + "...");
+}
 
 export const CREATE_SESSION_ENDPOINT = "/api/create-session";
 
